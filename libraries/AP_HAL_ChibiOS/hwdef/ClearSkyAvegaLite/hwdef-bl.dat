@@ -15,6 +15,9 @@ STM32_ST_USE_TIMER 5
 # flash size
 FLASH_SIZE_KB 1024
 
+# don't allow bootloader to use more than 16k
+FLASH_USE_MAX_KB 16
+
 # location of application code
 FLASH_BOOTLOADER_LOAD_KB 48
 
@@ -25,20 +28,17 @@ FLASH_RESERVE_START_KB 0
 #USB_STRING_MANUFACTURER "CSKY"
 
 # uarts and USB to run bootloader protocol on
-SERIAL_ORDER OTG1 USART1
+SERIAL_ORDER OTG1
 
 # this is the pin that senses USB being connected. It is an input pin
 # setup as OPENDRAIN
+#TODO
 #PA9 VBUS INPUT PULLUP
 PA9  PINIO1 OUTPUT HIGH
 
 # now we define the pins that USB is connected on
 PA11 OTG_FS_DM OTG1
 PA12 OTG_FS_DP OTG1
-
-# USART1
-PB6  USART1_TX USART1 
-PB7 USART1_RX USART1
 
 # define a LED
 PC0 LED_BOOTLOADER OUTPUT LOW GPIO(0)  # blue
