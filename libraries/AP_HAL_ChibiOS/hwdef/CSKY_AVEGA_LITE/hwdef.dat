@@ -1,0 +1,223 @@
+# hw definition file for ClearSky405
+
+USB_STRING_MANUFACTURER "CSKY"
+
+# MCU class and specific type
+MCU STM32F4xx STM32F427xx
+
+# bootloader starts firmware at 64k
+FLASH_RESERVE_START_KB 48
+FLASH_SIZE_KB 1024
+
+# store parameters in pages 11 and 12
+STORAGE_FLASH_PAGE 1
+define HAL_STORAGE_SIZE 15360
+
+# board ID for firmware load
+APJ_BOARD_ID 1138
+
+define STM32_ST_USE_TIMER 5
+
+# crystal frequency
+OSCILLATOR_HZ 8000000
+
+#MCU_CLOCKRATE_MHZ 180
+
+# --------------------- LED -----------------------
+PC0 LED0 OUTPUT LOW GPIO(90) # blue marked as ACT
+PC1 LED1 OUTPUT LOW GPIO(91) # green marked as B/E
+define HAL_GPIO_A_LED_PIN 91
+define HAL_GPIO_B_LED_PIN 90
+define HAL_GPIO_LED_OFF 1
+
+# --------------------- ADC ---------------------------
+PC5 BATT_VOLTAGE_SENS ADC1 SCALE(1)
+PA5 BATT_CURRENT_SENS ADC1 SCALE(1)
+#PF3 RSSI_ADC_PIN      ADC3 SCALE(1)
+
+define HAL_BATT_MONITOR_DEFAULT 4
+
+define HAL_BATT_VOLT_PIN 15
+define HAL_BATT_VOLT_SCALE 21.0
+
+define HAL_BATT_CURR_PIN 5
+define HAL_BATT_CURR_SCALE 10.35
+
+#define BOARD_RSSI_ANA_PIN 15
+
+# --------------------- PWM -----------------------
+PE14  TIM1_CH4   TIM1  PWM(1)  GPIO(50) BIDIR // M1
+PE13  TIM1_CH3   TIM1  PWM(2)  GPIO(51)  // M2
+PE11  TIM1_CH2   TIM1  PWM(3)  GPIO(52) BIDIR // M3
+PE9   TIM1_CH1   TIM1  PWM(4)  GPIO(53)  // M4
+
+#PC9   TIM8_CH4   TIM8  PWM(5)  GPIO(54)  // M5
+#PC8   TIM8_CH3   TIM8  PWM(6)  GPIO(55)  // M6
+#PC7   TIM8_CH2   TIM8  PWM(7)  GPIO(56)  // M7
+#PC6   TIM8_CH1   TIM8  PWM(8)  GPIO(57)  // M8
+
+# --------------------- SERVO ---------------------
+PA15  TIM2_CH1   TIM2  PWM(9)  GPIO(58) NODMA // S1
+PB11  TIM2_CH4   TIM2  PWM(10) GPIO(59) NODMA // S2
+PB3   TIM2_CH2   TIM2  PWM(11) GPIO(60) NODMA // S3
+PB10  TIM2_CH3   TIM2  PWM(12) GPIO(61) NODMA // S4
+
+PE6   TIM9_CH2   TIM9  PWM(13) GPIO(62) NODMA // S5
+PE5   TIM9_CH1   TIM9  PWM(14) GPIO(63) NODMA // S6
+
+PB1   TIM3_CH4   TIM3  PWM(15) GPIO(64) NODMA // S7
+PB0   TIM3_CH3   TIM3  PWM(16) GPIO(65) NODMA // S8
+PA7   TIM3_CH2   TIM3  PWM(17) GPIO(66) NODMA // S9
+PA6   TIM3_CH1   TIM3  PWM(18) GPIO(67) NODMA // S10
+
+PB14  TIM12_CH1  TIM12 PWM(19) GPIO(68) NODMA // S11
+PB15  TIM12_CH2  TIM12 PWM(20) GPIO(69) NODMA // S12
+
+# buzzer
+PD1 BUZZER OUTPUT GPIO(80) LOW
+define HAL_BUZZER_PIN 80
+define HAL_BUZZER_ON 1
+define HAL_BUZZER_OFF 0
+
+# --------------------- SPI2 -----------------------
+PB13 SPI2_SCK SPI2
+PC2  SPI2_MISO SPI2
+PC3  SPI2_MOSI SPI2
+
+PB12 MPU6000_CS CS
+PA8 EXTI_MPU6000 INPUT PULLUP
+
+# --------------------- SPI3 -----------------------
+PC10    SPI3_SCK SPI3
+PD6     SPI3_MOSI SPI3
+PC11    SPI3_MISO SPI3
+
+PD7  SDCARD_CS CS
+
+# --------------------- SPI5 -----------------------
+PF7     SPI5_SCK SPI5
+PF9     SPI5_MOSI SPI5
+PF8     SPI5_MISO SPI5
+
+PF4 OSD_CS CS
+
+# -------------------- I2C bus --------------------
+I2C_ORDER I2C2
+
+PF1 I2C2_SCL I2C2
+PF0 I2C2_SDA I2C2
+
+define HAL_I2C_INTERNAL_MASK 0
+
+# --------------------- UARTs ---------------------------
+SERIAL_ORDER OTG1 USART1 USART2 USART3 UART4 UART5 USART6 UART7 UART8
+
+#PA9 PINIO1 OUTPUT HIGH
+
+PA11 OTG_FS_DM OTG1
+PA12 OTG_FS_DP OTG1
+
+# USART1 (RCIN)
+PB6 USART1_TX USART1 
+PB7 USART1_RX USART1
+define DEFAULT_SERIAL1_PROTOCOL SerialProtocol_RCIN
+
+# USART2  (MAVLINK)
+PA2 USART2_TX USART2 
+PA3 USART2_RX USART2
+define DEFAULT_SERIAL2_PROTOCOL SerialProtocol_MAVLink2
+
+# USART3
+PD8 USART3_TX USART3
+PD9 USART3_RX USART3
+define DEFAULT_SERIAL3_PROTOCOL SerialProtocol_MAVLink2
+
+# UART4 (ESC Telemetry 2)
+PA0 UART4_TX UART4 NODMA
+PA1 UART4_RX UART4 NODMA
+define DEFAULT_SERIAL4_PROTOCOL SerialProtocol_ESCTelemetry
+define HAL_SERIAL4_BAUD 19200
+
+# UART5 (DJI / VTX)
+PC12 UART5_TX UART5 NODMA
+PD2  UART5_RX UART5 NODMA
+define DEFAULT_SERIAL5_PROTOCOL SerialProtocol_DJI_FPV
+define HAL_SERIAL5_BAUD 115
+
+# USART6
+PG14 USART6_TX USART6 NODMA
+PG9  USART6_RX USART6 NODMA
+define DEFAULT_SERIAL6_PROTOCOL SerialProtocol_None
+define HAL_SERIAL6_BAUD 57
+
+# UART7 (ESC Telemetry 1)
+PE8  UART7_TX UART7 NODMA
+PE7  UART7_RX UART7 NODMA
+define DEFAULT_SERIAL7_PROTOCOL SerialProtocol_ESCTelemetry
+define HAL_SERIAL7_BAUD 19200
+
+# UART8 (GPS)
+PE1  UART8_TX UART8
+PE0  UART8_RX UART8
+define DEFAULT_SERIAL8_PROTOCOL SerialProtocol_GPS
+define HAL_SERIAL8_BAUD AP_SERIALMANAGER_GPS_BAUD
+
+
+# ------------------- DMA assignment -------------------
+DMA_PRIORITY SPI2* TIM1* TIM8* 
+
+
+# ------------------- IMU MPU6000 ---------------------
+# SPI devices
+SPIDEV mpu6000   SPI2 DEVID1 MPU6000_CS MODE3 1*MHZ 8*MHZ 
+IMU Invensense SPI:mpu6000 ROTATION_PITCH_180_YAW_90
+define HAL_DEFAULT_INS_FAST_SAMPLE 1
+
+# ------------------ OSD AT7456E ----------------------
+SPIDEV osd       SPI5  DEVID2  OSD_CS  MODE0 10*MHZ 10*MHZ
+
+define OSD_ENABLED 1
+define HAL_OSD_TYPE_DEFAULT 1
+ROMFS_WILDCARD libraries/AP_OSD/fonts/font0.bin
+
+# --------------------- SD & FLASH ----------------------
+SPIDEV sdcard    SPI3 DEVID3 SDCARD_CS  MODE3 104*MHZ 104*MHZ
+
+#define HAL_LOGGING_DATAFLASH_ENABLED 1
+
+define HAL_OS_FATFS_IO 1
+define HAL_BOARD_LOG_DIRECTORY "/APM/LOGS"
+define HAL_BOARD_TERRAIN_DIRECTORY "/APM/TERRAIN"
+
+# ----------------- I2C compass & Baro -----------------
+# no built-in compass, but probe the i2c bus for all possible
+# external compass types
+#define HAL_BARO_ALLOW_INIT_NO_BARO # disable baro
+
+define ALLOW_ARM_NO_COMPASS
+define HAL_PROBE_EXTERNAL_I2C_COMPASSES
+define HAL_I2C_INTERNAL_MASK 0
+define HAL_COMPASS_AUTO_ROT_DEFAULT 2
+
+# built-in barometer
+BARO BMP388 I2C:0:0x77
+
+# -------reduce max size of embedded params for apj_tool.py
+define AP_PARAM_MAX_EMBEDDED_PARAM 1024
+define HAL_GYROFFT_ENABLED 0
+
+# --------------------- save flash ----------------------
+# save some flash
+include ../include/save_some_flash.inc
+define AP_BATTERY_SMBUS_ENABLED 0
+define HAL_PARACHUTE_ENABLED 0
+define HAL_SPRAYER_ENABLED 0
+define PRECISION_LANDING 0
+define AP_GRIPPER_ENABLED 0
+define HAL_RUNCAM_ENABLED 0
+define HAL_HOTT_TELEM_ENABLED 0
+define HAL_NMEA_OUTPUT_ENABLED 0
+define HAL_BUTTON_ENABLED 0
+define AP_NOTIFY_OREOLED_ENABLED 0
+define HAL_PICCOLO_CAN_ENABLE 0
+define AP_BATTERY_SYNTHETIC_CURRENT_ENABLED 0
