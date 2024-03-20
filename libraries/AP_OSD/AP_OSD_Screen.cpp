@@ -1605,7 +1605,7 @@ void AP_OSD_Screen::draw_horizon(uint8_t x, uint8_t y)
         roll = -roll;
     }
 
-    pitch = constrain_float(pitch, -ah_max_pitch, ah_max_pitch);
+    pitch = constrain_float(pitch, -1, 1);
     float ky = sinf(roll);
     float kx = cosf(roll);
 
@@ -1633,10 +1633,14 @@ void AP_OSD_Screen::draw_horizon(uint8_t x, uint8_t y)
             }
         }
     }
+    
 
     if (!check_option(AP_OSD::OPTION_DISABLE_CROSSHAIR)) {
-        backend->write(x-1,y, false, "%c%c%c", SYMBOL(SYM_AH_CENTER_LINE_LEFT), SYMBOL(SYM_AH_CENTER), SYMBOL(SYM_AH_CENTER_LINE_RIGHT));
+        backend->write(x-1,y, false, "%c%c", SYMBOL(SYM_AH_CENTER_LINE_LEFT), SYMBOL(SYM_AH_CENTER_LINE_RIGHT));
     }
+    float dy = pitch * ah_pitch_rad_to_char + 0.5f;
+    float dx = roll * ah_pitch_rad_to_char + 0.5f;
+    backend->write(x + dx, y - dy, false, "%c", SYMBOL(SYM_AH_CENTER));
 
 }
 
