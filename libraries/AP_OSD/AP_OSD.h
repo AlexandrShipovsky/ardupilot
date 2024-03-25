@@ -178,6 +178,7 @@ private:
     AP_OSD_Setting message{true, 2, 6};
     AP_OSD_Setting gspeed{true, 2, 14};
     AP_OSD_Setting horizon{true, 14, 8};
+    AP_OSD_Setting followme{true, 14, 8};
     AP_OSD_Setting home{true, 14, 1};
     AP_OSD_Setting throttle{true, 24, 11};
     AP_OSD_Setting heading{true, 13, 2};
@@ -258,6 +259,7 @@ private:
     void draw_message(uint8_t x, uint8_t y);
     void draw_gspeed(uint8_t x, uint8_t y);
     void draw_horizon(uint8_t x, uint8_t y);
+    void draw_followme(uint8_t x, uint8_t y);
     void draw_home(uint8_t x, uint8_t y);
     void draw_throttle(uint8_t x, uint8_t y);
     void draw_heading(uint8_t x, uint8_t y);
@@ -535,6 +537,10 @@ public:
     AP_Int32 options;
 
 #if OSD_ENABLED
+    float x_followme;
+    float y_followme;
+    uint8_t status_followme;
+
     AP_Int8 rc_channel;
     AP_Int8 sw_method;
 

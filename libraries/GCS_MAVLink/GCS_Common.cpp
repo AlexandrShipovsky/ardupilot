@@ -3961,12 +3961,30 @@ void GCS_MAVLINK::handle_heartbeat(const mavlink_message_t &msg) const
     }
 }
 
+void GCS_MAVLINK::handle_followme(const mavlink_message_t &msg) const
+{
+    mavlink_followme_osd_t packet;
+    mavlink_msg_followme_osd_decode(&msg,&packet);
+
+    AP_OSD *osd = AP::osd();
+    if (osd != nullptr) {
+        osd->x_followme = packet.x;
+        osd->y_followme = packet.y;
+        osd->status_followme = (uint8_t)packet.status;
+    }
+}
+
 /*
   handle messages which don't require vehicle specific data
  */
 void GCS_MAVLINK::handle_message(const mavlink_message_t &msg)
 {
     switch (msg.msgid) {
+
+    case MAVLINK_MSG_ID_FOLLOWME_OSD:  {
+        handle_followme(msg);
+        break;
+    }
 
     case MAVLINK_MSG_ID_HEARTBEAT: {
         handle_heartbeat(msg);
