@@ -1605,7 +1605,7 @@ void AP_OSD_Screen::draw_horizon(uint8_t x, uint8_t y)
         roll = -roll;
     }
 
-    pitch = constrain_float(pitch, -1, 1);
+    pitch = constrain_float(pitch, -ah_max_pitch, ah_max_pitch);
     float ky = sinf(roll);
     float kx = cosf(roll);
 
@@ -1638,10 +1638,24 @@ void AP_OSD_Screen::draw_horizon(uint8_t x, uint8_t y)
     if (!check_option(AP_OSD::OPTION_DISABLE_CROSSHAIR)) {
         backend->write(x-1,y, false, "%c%c", SYMBOL(SYM_AH_CENTER_LINE_LEFT), SYMBOL(SYM_AH_CENTER_LINE_RIGHT));
     }
-    float dy = pitch * ah_pitch_rad_to_char + 0.5f;
-    float dx = roll * ah_pitch_rad_to_char + 0.5f;
-    backend->write(x + dx, y - dy, false, "%c", SYMBOL(SYM_AH_CENTER));
+}
 
+void AP_OSD_Screen::draw_followme(uint8_t x, uint8_t y)
+{
+    AP_OSD *osdobj = AP::osd();
+    float dx,dy;
+    const char str[5] = "CSKY";
+
+    if(osd->status_followme)
+    {
+        dx = osdobj->x_followme*15.0;
+        dy = osdobj->y_followme*8.0;
+        backend->write(x + dx, y + dy, false, "%c", SYMBOL(SYM_AH_CENTER));
+        backend->write(x+10, y+4, false, "%s", str);
+    }else
+    {
+        backend->write(x, y, false, "%c", SYMBOL(SYM_AH_CENTER));
+    }
 }
 
 void AP_OSD_Screen::draw_distance(uint8_t x, uint8_t y, float distance)
@@ -2301,6 +2315,7 @@ void AP_OSD_Screen::draw(void)
 
     DRAW_SETTING(message);
     DRAW_SETTING(horizon);
+    DRAW_SETTING(followme);
     DRAW_SETTING(compass);
     DRAW_SETTING(altitude);
 
