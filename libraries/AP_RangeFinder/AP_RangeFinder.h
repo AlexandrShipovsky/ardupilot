@@ -177,6 +177,9 @@ public:
 #if AP_RANGEFINDER_AINSTEIN_LR_D1_ENABLED
         Ainstein_LR_D1 = 42,
 #endif
+#if AP_RANGEFINDER_FMK24_E5200_ENABLED
+        FMK24_E5200 = 43,
+#endif
 #if AP_RANGEFINDER_SIM_ENABLED
         SIM = 100,
 #endif
