@@ -52,6 +52,16 @@
 #include "AP_RangeFinder_USD1_CAN.h"
 #include "AP_RangeFinder_Benewake_CAN.h"
 #include "AP_RangeFinder_Lua.h"
+<<<<<<< HEAD
+=======
+#include "AP_RangeFinder_NoopLoop.h"
+#include "AP_RangeFinder_TOFSenseP_CAN.h"
+#include "AP_RangeFinder_NRA24_CAN.h"
+#include "AP_RangeFinder_TOFSenseF_I2C.h"
+#include "AP_RangeFinder_JRE_Serial.h"
+#include "AP_RangeFinder_Ainstein_LR_D1.h"
+#include "AP_RangeFinder_FMK24_E5200.h"
+>>>>>>> 0143a77e27... ADD FMK_E5200 radar
 
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_Logger/AP_Logger.h>
@@ -534,7 +544,9 @@ void RangeFinder::detect_instance(uint8_t instance, uint8_t& serial_instance)
         _add_backend(new AP_RangeFinder_Lua(state[instance], params[instance]), instance);
 #endif
         break;
-
+    case Type::FMK24_E5200:
+        serial_create_fn = AP_RangeFinder_FMK24_E5200::create;
+        break;
     case Type::NONE:
         break;
     }
