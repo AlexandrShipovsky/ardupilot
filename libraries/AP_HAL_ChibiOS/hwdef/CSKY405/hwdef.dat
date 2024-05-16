@@ -28,7 +28,6 @@ PA14 LED0 OUTPUT LOW GPIO(90) # blue marked as ACT
 PA13 LED1 OUTPUT LOW GPIO(91) # green marked as B/E
 define HAL_GPIO_A_LED_PIN 91
 define HAL_GPIO_B_LED_PIN 90
-define HAL_GPIO_LED_OFF 1
 
 # --------------------- PWM -----------------------
 PA8  TIM1_CH1   TIM1  PWM(1)  GPIO(50)          // S1
@@ -148,7 +147,6 @@ define HAL_BOARD_TERRAIN_DIRECTORY "/APM/TERRAIN"
 # external compass types
 define ALLOW_ARM_NO_COMPASS
 define HAL_PROBE_EXTERNAL_I2C_COMPASSES
-define HAL_I2C_INTERNAL_MASK 0
 define HAL_COMPASS_AUTO_ROT_DEFAULT 2
 
 # built-in barometer
@@ -172,7 +170,6 @@ define HAL_DEFAULT_AIRSPEED_PIN 10
 
 # -------reduce max size of embedded params for apj_tool.py
 define AP_PARAM_MAX_EMBEDDED_PARAM 1024
-define HAL_GYROFFT_ENABLED 0
 
 # --------------------- save flash ----------------------
 # save some flash
@@ -180,11 +177,5 @@ include ../include/minimize_fpv_osd.inc
 include ../include/no_bootloader_DFU.inc
 
 define HAL_PARACHUTE_ENABLED 1
-define HAL_SPRAYER_ENABLED 0
-define AP_GRIPPER_ENABLED 0
 define HAL_RUNCAM_ENABLED 0
-define HAL_HOTT_TELEM_ENABLED 0
-define HAL_NMEA_OUTPUT_ENABLED 0
 define HAL_BUTTON_ENABLED 0
-define AP_NOTIFY_OREOLED_ENABLED 0
-define HAL_PICCOLO_CAN_ENABLE 0
