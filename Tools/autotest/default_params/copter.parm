@@ -42,12 +42,12 @@ RC7_TRIM        1500.000000
 RC8_MAX         2000.000000
 RC8_MIN         1000.000000
 RC8_TRIM        1500.000000
-FLTMODE1        7
-FLTMODE2        9
-FLTMODE3        6
-FLTMODE4        3
-FLTMODE5        5
-FLTMODE6		0
+FLTMODE1        0
+FLTMODE2        0
+FLTMODE3        0
+FLTMODE4        0
+FLTMODE5        0
+FLTMODE6		29
 SIM_BARO_RND    0
 # we need small INS_ACC offsets so INS is recognised as being calibrated
 INS_ACCOFFS_X   0.001

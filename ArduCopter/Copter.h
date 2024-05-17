@@ -1034,6 +1034,9 @@ private:
 #if MODE_GUIDED_NOGPS_ENABLED == ENABLED
     ModeGuidedNoGPS mode_guided_nogps;
 #endif
+#if MODE_FOLLOWME_ENABLED == ENABLED
+    ModeFollowMe mode_followme;
+#endif
 #if MODE_SMARTRTL_ENABLED == ENABLED
     ModeSmartRTL mode_smartrtl;
 #endif

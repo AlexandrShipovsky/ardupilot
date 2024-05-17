@@ -137,6 +137,12 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
             break;
 #endif
 
+#if MODE_FOLLOWME_ENABLED == ENABLED
+        case Mode::Number::FOLLOWME:
+            ret = &mode_followme;
+            break;
+#endif
+
 #if MODE_SMARTRTL_ENABLED == ENABLED
         case Mode::Number::SMART_RTL:
             ret = &mode_smartrtl;
