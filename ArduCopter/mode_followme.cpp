@@ -18,35 +18,68 @@ bool ModeFollowMe::init(bool ignore_checks)
 // should be called at 100hz or more
 void ModeFollowMe::run()
 {
-    Quaternion attitude_quat;     //Quaternion(0.319,0.648,0.243,0.648);
-    attitude_quat.from_euler(0,0.5,0);
+    Quaternion attitude_quat;           // Quaternion(0.319,0.648,0.243,0.648);
+    float alphaFOV = DEG_TO_RAD * 93.0; // TODO make params
+    //float betaFOV = DEG_TO_RAD*93.0;
 
-        // check if the message's thrust field should be interpreted as a climb rate or as thrust
-        const bool use_thrust = set_attitude_target_provides_thrust();
+    AP_OSD *osdobj = AP::osd();
+    WITH_SEMAPHORE(ahrs.get_semaphore());
 
-        float climb_rate_or_thrust;
-        float thrust = 0.5;
-        if (use_thrust) {
-            // interpret thrust as thrust
-            climb_rate_or_thrust = constrain_float(thrust, -1.0f, 1.0f);
-        } else {
-            // convert thrust to climb rate
-            thrust = constrain_float(thrust, 0.0f, 1.0f);
-            if (is_equal(thrust, 0.5f)) {
-                climb_rate_or_thrust = 0.0f;
-            } else if (thrust > 0.5f) {
-                // climb at up to WPNAV_SPEED_UP
-                climb_rate_or_thrust = (thrust - 0.5f) * 2.0f * wp_nav->get_default_speed_up();
-            } else {
-                // descend at up to WPNAV_SPEED_DN
-                climb_rate_or_thrust = (0.5f - thrust) * 2.0f * -wp_nav->get_default_speed_down();
-            }
+    float phi, deltaphi;
+    float teta, deltateta;
+    float psi, deltapsi;
+    if (osdobj->status_followme)
+    {
+        deltapsi = (alphaFOV / 2) * osdobj->x_followme;
+    }else
+    {
+        deltaphi = 0.0;
+        deltateta = 0.0;
+        deltapsi = 0.0;
+    }
+    phi = ahrs.get_roll() + deltaphi;
+    teta = ahrs.get_pitch() + deltateta;
+    psi = ahrs.get_yaw() + deltapsi;
+
+    (void)phi;
+    (void)teta;
+
+    attitude_quat.from_euler(0, 0, psi);
+
+    // check if the message's thrust field should be interpreted as a climb rate or as thrust
+    const bool use_thrust = set_attitude_target_provides_thrust();
+
+    float climb_rate_or_thrust;
+    float thrust = 0.5;
+    if (use_thrust)
+    {
+        // interpret thrust as thrust
+        climb_rate_or_thrust = constrain_float(thrust, -1.0f, 1.0f);
+    }
+    else
+    {
+        // convert thrust to climb rate
+        thrust = constrain_float(thrust, 0.0f, 1.0f);
+        if (is_equal(thrust, 0.5f))
+        {
+            climb_rate_or_thrust = 0.0f;
         }
+        else if (thrust > 0.5f)
+        {
+            // climb at up to WPNAV_SPEED_UP
+            climb_rate_or_thrust = (thrust - 0.5f) * 2.0f * wp_nav->get_default_speed_up();
+        }
+        else
+        {
+            // descend at up to WPNAV_SPEED_DN
+            climb_rate_or_thrust = (0.5f - thrust) * 2.0f * -wp_nav->get_default_speed_down();
+        }
+    }
 
     Vector3f ang_vel;
-    //set target
+    // set target
     set_angle(attitude_quat, ang_vel,
-                climb_rate_or_thrust, use_thrust);
+              climb_rate_or_thrust, use_thrust);
 
     // run angle controller
     ModeGuided::angle_control_run();
