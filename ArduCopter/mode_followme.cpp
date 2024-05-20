@@ -20,31 +20,44 @@ void ModeFollowMe::run()
 {
     Quaternion attitude_quat;           // Quaternion(0.319,0.648,0.243,0.648);
     float alphaFOV = DEG_TO_RAD * 93.0; // TODO make params
-    //float betaFOV = DEG_TO_RAD*93.0;
+    float betaFOV = DEG_TO_RAD*93.0;
+
+    Vector3F targetV;   // vetctor target norm
+    float F = 0.35;    // lenght of vector f
 
     AP_OSD *osdobj = AP::osd();
     WITH_SEMAPHORE(ahrs.get_semaphore());
 
-    float phi, deltaphi;
-    float teta, deltateta;
-    float psi, deltapsi;
+    float phi,teta,psi;
+
+    // vector power
+    float Fteta,Fphi;
     if (osdobj->status_followme)
     {
-        deltapsi = (alphaFOV / 2) * osdobj->x_followme;
+        psi = (alphaFOV / 2) * osdobj->x_followme;
+        teta = (betaFOV/2)*osdobj->y_followme;
+
+        // calc target vector
+        targetV.x = cosF(psi);
+        targetV.y = sinF(psi);
+        targetV.z = cosF(teta);
+
+        //targetV.rotate_xy(ahrs.get_yaw());
+
+        // calc F
+        Fteta = -asinF(F*targetV.x);
+        Fphi = asinF(F*targetV.y);
     }else
     {
-        deltaphi = 0.0;
-        deltateta = 0.0;
-        deltapsi = 0.0;
+        Fteta = 0.0;
+        Fphi = 0.0;
+        psi = 0;
     }
-    phi = ahrs.get_roll() + deltaphi;
-    teta = ahrs.get_pitch() + deltateta;
-    psi = ahrs.get_yaw() + deltapsi;
 
     (void)phi;
     (void)teta;
 
-    attitude_quat.from_euler(0, 0, psi);
+    attitude_quat.from_euler(Fphi, Fteta, ahrs.get_yaw()+psi);
 
     // check if the message's thrust field should be interpreted as a climb rate or as thrust
     const bool use_thrust = set_attitude_target_provides_thrust();
