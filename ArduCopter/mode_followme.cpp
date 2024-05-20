@@ -24,6 +24,7 @@ void ModeFollowMe::run()
 
     Vector3F targetV;   // vetctor target norm
     float F = 0.35;    // lenght of vector f
+    float compYspeed = 1.5;
 
     AP_OSD *osdobj = AP::osd();
     WITH_SEMAPHORE(ahrs.get_semaphore());
@@ -37,7 +38,7 @@ void ModeFollowMe::run()
         psi = (alphaFOV / 2) * osdobj->x_followme;
         teta = (betaFOV/2)*osdobj->y_followme;
 
-        // calc target vector
+        // calc target vector body frame
         targetV.x = cosF(psi);
         targetV.y = sinF(psi);
         targetV.z = cosF(teta);
@@ -46,7 +47,7 @@ void ModeFollowMe::run()
 
         // calc F
         Fteta = -asinF(F*targetV.x);
-        Fphi = asinF(F*targetV.y);
+        Fphi = asinF(F*targetV.y) + ahrs.get_gyro().z;
     }else
     {
         Fteta = 0.0;
