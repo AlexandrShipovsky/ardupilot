@@ -47,7 +47,7 @@ void ModeFollowMe::run()
 
         // calc F
         Fteta = -asinF(F*targetV.x);
-        Fphi = asinF(F*targetV.y) + ahrs.get_gyro().z;
+        Fphi = asinF(F*targetV.y) + compYspeed*ahrs.get_gyro().z;
     }else
     {
         Fteta = 0.0;
