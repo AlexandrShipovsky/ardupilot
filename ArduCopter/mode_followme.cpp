@@ -50,8 +50,8 @@ void ModeFollowMe::run()
         Fphi = asinF(F*targetV.y) + compYspeed*ahrs.get_gyro().z;
     }else
     {
-        Fteta = 0.0;
-        Fphi = 0.0;
+        Fteta = ahrs.get_pitch();
+        Fphi = ahrs.get_roll();
         psi = 0;
     }
 
