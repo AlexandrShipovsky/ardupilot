@@ -9,13 +9,16 @@
 // initialise guided_nogps controller
 bool ModeFollowMe::init(bool ignore_checks)
 {
+    // init LPF for vertical speed control
+    AngleCapture = false;
+    targetAngleFilt.set_cutoff_frequency(5.0);
     // start in angle control mode
     ModeGuided::angle_control_start();
     return true;
 }
 
 // guided_run - runs the guided controller
-// should be called at 100hz or more
+// should be called at 100hz or more M_PI
 void ModeFollowMe::run()
 {
     Quaternion attitude_quat;           // Quaternion(0.319,0.648,0.243,0.648);
@@ -23,8 +26,9 @@ void ModeFollowMe::run()
     float betaFOV = DEG_TO_RAD*93.0;
 
     Vector3F targetV;   // vetctor target norm
-    float F = 0.35;    // lenght of vector f
+    float F = 0.2;    // lenght of vector f
     float compYspeed = 1.5;
+    float thrust = 0.5;
 
     AP_OSD *osdobj = AP::osd();
     WITH_SEMAPHORE(ahrs.get_semaphore());
@@ -48,11 +52,29 @@ void ModeFollowMe::run()
         // calc F
         Fteta = -asinF(F*targetV.x);
         Fphi = asinF(F*targetV.y) + compYspeed*ahrs.get_gyro().z;
+
+        // vertical control
+        if(!AngleCapture)
+        {
+            
+            AngleCapture = true;
+            targetAngleSetpoint = ahrs.get_pitch() - teta;
+            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s%.4f", "Angle to target capture: ",targetAngleSetpoint);
+            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s%.4f", "Teta: ",-teta);
+            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s%.4f", "Pitch: ",ahrs.get_pitch());
+        }
+        targetAngleFilt.apply(ahrs.get_pitch() - teta);
+        targetAngleFiltValue = targetAngleFilt.get();
+        thrust = 0.5 + 15.0*(targetAngleFiltValue - targetAngleSetpoint);
     }else
     {
         Fteta = ahrs.get_pitch();
         Fphi = ahrs.get_roll();
         psi = 0;
+
+        targetAngleFilt.reset();
+        AngleCapture = false;
+        thrust = 0.5;
     }
 
     (void)phi;
@@ -64,7 +86,6 @@ void ModeFollowMe::run()
     const bool use_thrust = set_attitude_target_provides_thrust();
 
     float climb_rate_or_thrust;
-    float thrust = 0.5;
     if (use_thrust)
     {
         // interpret thrust as thrust

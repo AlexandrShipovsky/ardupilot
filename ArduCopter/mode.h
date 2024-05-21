@@ -1194,6 +1194,9 @@ protected:
     const char *name4() const override { return "FLME"; }
 
 private:
+    LowPassFilterFloat targetAngleFilt;
+    float targetAngleFiltValue,targetAngleSetpoint;
+    bool AngleCapture;
 
 };
 
