@@ -136,6 +136,7 @@ void ModeFollowMe::run()
         AP::logger().WriteStreaming(
             "FLME",
             "TimeUS,AngT,AngS,ThrS,Psi,Teta",
+            "srr-rr"
             "Qfffff",
             AP_HAL::micros64(),
             (double)targetAngleFiltValue,
