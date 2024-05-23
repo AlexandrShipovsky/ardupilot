@@ -1196,7 +1196,10 @@ protected:
 private:
     LowPassFilterFloat targetAngleFilt;
     float targetAngleFiltValue,targetAngleSetpoint;
+    float thrust;
     bool AngleCapture;
+
+    uint32_t last_log_ms;
 
 };
 
