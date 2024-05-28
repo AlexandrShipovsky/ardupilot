@@ -16,6 +16,24 @@ const AP_Param::GroupInfo ModeFollowMe::var_info[] = {
     // @Range: 0 180
     AP_GROUPINFO("VFOV", 2, ModeFollowMe, vFOV, 90.0f),
 
+    // @Param: FLEN
+    // @DisplayName: lenght of vector f
+    // @Description: lenght of vector f
+    // @Range: 0 0.5
+    AP_GROUPINFO("FLEN", 3, ModeFollowMe, F, 0.125f),
+
+    // @Param: FLEN
+    // @DisplayName: compensation side speed
+    // @Description: compensation side speed
+    // @Range: 0 3.0
+    AP_GROUPINFO("COMPY", 4, ModeFollowMe, compYspeed, 1.5f),
+
+    // @Param: FLEN
+    // @DisplayName: proportional gain vertical velocity
+    // @Description: proportional gain vertical velocity
+    // @Range: 0 20.0
+    AP_GROUPINFO("THRP", 5, ModeFollowMe, thrustP, 10.0f),
+
     AP_GROUPEND
 };
 
@@ -26,6 +44,8 @@ const AP_Param::GroupInfo ModeFollowMe::var_info[] = {
 // initialise guided_nogps controller
 bool ModeFollowMe::init(bool ignore_checks)
 {
+    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s%.4f%s%.4f%s%.4f%s%.4f%s%.4f", "HFOV: ",(float)hFOV," VFOV: ",(float)vFOV," FLEN: ",(float)F," COMPY: ",(float)compYspeed," THRP: ",(float)thrustP);
+
     // init LPF for vertical speed control
     AngleCapture = false;
     targetAngleFilt.set_cutoff_frequency(20.0);
@@ -50,8 +70,8 @@ void ModeFollowMe::run()
     float Fteta = 0,Fphi = 0;
     if (osdobj->status_followme)
     {
-        psi = (hFOV / 2) * osdobj->x_followme;
-        teta = (vFOV/2)*osdobj->y_followme;
+        psi = (DEG_TO_RAD*hFOV / 2) * osdobj->x_followme;
+        teta = (DEG_TO_RAD*vFOV/2)*osdobj->y_followme;
 
         // calc target vector body frame
         targetV.x = cosF(psi);
