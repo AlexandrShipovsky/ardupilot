@@ -18,7 +18,7 @@ bool ModeFollowMe::init(bool ignore_checks)
 }
 
 // guided_run - runs the guided controller
-// should be called at 100hz or more M_PI
+// should be called at 100hz or more
 void ModeFollowMe::run()
 {
     float alphaFOV = DEG_TO_RAD * 93.0; // TODO make params
@@ -136,7 +136,6 @@ void ModeFollowMe::run()
         AP::logger().WriteStreaming(
             "FLME",
             "TimeUS,AngT,AngS,ThrS,Psi,Teta",
-            "srr-rr"
             "Qfffff",
             AP_HAL::micros64(),
             (double)targetAngleFiltValue,
