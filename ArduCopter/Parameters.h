@@ -25,7 +25,7 @@ public:
     // The increment will prevent old parameters from being used incorrectly
     // by newer code.
     //
-    static const uint16_t        k_format_version = 120;
+    static const uint16_t        k_format_version = 121;
 
     // Parameter identities.
     //
@@ -381,6 +381,7 @@ public:
         k_param_vehicle = 257, // vehicle common block of parameters
         k_param_throw_altitude_min,
         k_param_throw_altitude_max,
+        k_param_mode_followme,
 
         // the k_param_* space is 9-bits in size
         // 511: reserved

@@ -1177,6 +1177,8 @@ private:
 class ModeFollowMe : public ModeGuided {
 
 public:
+    static const struct AP_Param::GroupInfo var_info[];
+
     // inherit constructor
     using ModeGuided::Mode;
     Number mode_number() const override { return Number::FOLLOWME; }
@@ -1192,6 +1194,14 @@ protected:
 
     const char *name() const override { return "FOLLOWME"; }
     const char *name4() const override { return "FLME"; }
+
+        // PARAMS
+    AP_Float hFOV;         // horizontal FOV def 120grad
+    AP_Float vFOV;           // vertical FOV def 90grad
+    AP_Float F;                        // lenght of vector f // def 0.125
+    AP_Float compYspeed;                 // compensation side speed // def 1.5
+    AP_Float thrustP;                   // proportional gain vertical velocity //def 10.0
+
 
 private:
     LowPassFilterFloat targetAngleFilt;

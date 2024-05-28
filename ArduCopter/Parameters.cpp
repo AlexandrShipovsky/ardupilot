@@ -478,6 +478,12 @@ const AP_Param::Info Copter::var_info[] = {
     // @Path: ../libraries/AP_Compass/AP_Compass.cpp
     GOBJECT(compass,        "COMPASS_", Compass),
 
+#if MODE_FOLLOWME_ENABLED == ENABLED
+    // @Group: FOLLOWME
+    // @Path: 
+    GOBJECT(mode_followme,        "FLME_", ModeFollowMe),
+#endif
+
     // @Group: INS
     // @Path: ../libraries/AP_InertialSensor/AP_InertialSensor.cpp
     GOBJECT(ins,            "INS", AP_InertialSensor),

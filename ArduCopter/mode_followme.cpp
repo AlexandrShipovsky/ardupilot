@@ -1,6 +1,23 @@
 #include "Copter.h"
 
-#if MODE_GUIDED_NOGPS_ENABLED == ENABLED
+#if MODE_FOLLOWME_ENABLED == ENABLED
+
+const AP_Param::GroupInfo ModeFollowMe::var_info[] = {
+
+    // @Param: HFOV
+    // @DisplayName: Horizontal camera FOV
+    // @Description: Horizontal camera FOV
+    // @Range: 0 180
+    AP_GROUPINFO("HFOV", 1, ModeFollowMe, hFOV, 120.0f),
+
+    // @Param: VFOV
+    // @DisplayName: Vertical camera FOV
+    // @Description: Horizontal camera FOV
+    // @Range: 0 180
+    AP_GROUPINFO("VFOV", 2, ModeFollowMe, vFOV, 90.0f),
+
+    AP_GROUPEND
+};
 
 /*
  * Init and run calls for guided_nogps flight mode
@@ -21,12 +38,6 @@ bool ModeFollowMe::init(bool ignore_checks)
 // should be called at 100hz or more
 void ModeFollowMe::run()
 {
-    float alphaFOV = DEG_TO_RAD * 93.0; // TODO make params
-    float betaFOV = DEG_TO_RAD*52.3;
-    float F = 0.125;    // lenght of vector f   // TODO PARAM
-    float compYspeed = 1.5; // TODO PARAM
-    float thrustP = 10.0;   // TODO PARAM
-
     Quaternion attitude_quat;           // Quaternion(0.319,0.648,0.243,0.648);
     Vector3F targetV;   // vetctor target norm
 
@@ -39,8 +50,8 @@ void ModeFollowMe::run()
     float Fteta = 0,Fphi = 0;
     if (osdobj->status_followme)
     {
-        psi = (alphaFOV / 2) * osdobj->x_followme;
-        teta = (betaFOV/2)*osdobj->y_followme;
+        psi = (hFOV / 2) * osdobj->x_followme;
+        teta = (vFOV/2)*osdobj->y_followme;
 
         // calc target vector body frame
         targetV.x = cosF(psi);
