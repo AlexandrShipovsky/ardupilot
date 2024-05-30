@@ -48,7 +48,8 @@ bool ModeFollowMe::init(bool ignore_checks)
 
     // init LPF for vertical speed control
     AngleCapture = false;
-    targetAngleFilt.set_cutoff_frequency(20.0);
+    targetAngleFilt.set_cutoff_frequency(0.5);
+    PsiAngleFilt.set_cutoff_frequency(5.0);
     // start in angle control mode
     ModeGuided::angle_control_start();
     return true;
@@ -64,7 +65,7 @@ void ModeFollowMe::run()
     AP_OSD *osdobj = AP::osd();
     WITH_SEMAPHORE(ahrs.get_semaphore());
 
-    float phi = 0,teta = 0,psi = 0;
+    float teta = 0,psi = 0;
 
     // vector power
     float Fteta = 0,Fphi = 0;
@@ -72,6 +73,10 @@ void ModeFollowMe::run()
     {
         psi = (DEG_TO_RAD*hFOV / 2) * osdobj->x_followme;
         teta = (DEG_TO_RAD*vFOV/2)*osdobj->y_followme;
+
+        // filt psi
+        PsiAngleFilt.apply(psi);
+        psi = PsiAngleFilt.get();
 
         // calc target vector body frame
         targetV.x = cosF(psi);
@@ -89,8 +94,6 @@ void ModeFollowMe::run()
             AngleCapture = true;
             targetAngleSetpoint = ahrs.get_pitch() - teta;
             GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s%.4f", "Angle to target capture: ",targetAngleSetpoint);
-            //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s%.4f", "Teta: ",-teta);
-            //GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s%.4f", "Pitch: ",ahrs.get_pitch());
         }
         targetAngleFilt.apply(ahrs.get_pitch() - teta);
         targetAngleFiltValue = targetAngleFilt.get();
@@ -102,12 +105,10 @@ void ModeFollowMe::run()
         psi = 0;
 
         targetAngleFilt.reset();
+        PsiAngleFilt.reset();
         AngleCapture = false;
         thrust = 0.5;
     }
-
-    (void)phi;
-    (void)teta;
 
     attitude_quat.from_euler(Fphi, Fteta, ahrs.get_yaw()+psi);
 
@@ -166,14 +167,16 @@ void ModeFollowMe::run()
 
         AP::logger().WriteStreaming(
             "FLME",
-            "TimeUS,AngT,AngS,ThrS,Psi,Teta",
-            "Qfffff",
+            "TimeUS,AngT,AngS,ThrS,Psi,Teta,x,y",
+            "Qfffffff",
             AP_HAL::micros64(),
-            (double)targetAngleFiltValue,
-            (double)targetAngleSetpoint,
+            (double)RAD_TO_DEG*targetAngleFiltValue,
+            (double)RAD_TO_DEG*targetAngleSetpoint,
             (double)thrust,
-            (double)psi,
-            (double)teta
+            (double)RAD_TO_DEG*psi,
+            (double)RAD_TO_DEG*teta,
+            (double)osdobj->x_followme,
+            (double)osdobj->y_followme
         );
     }
 #endif  // HAL_LOGGING_ENABLED

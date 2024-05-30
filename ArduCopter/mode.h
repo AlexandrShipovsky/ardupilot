@@ -1205,6 +1205,7 @@ protected:
 
 private:
     LowPassFilterFloat targetAngleFilt;
+    LowPassFilterFloat PsiAngleFilt;
     float targetAngleFiltValue,targetAngleSetpoint;
     float thrust;
     bool AngleCapture;
