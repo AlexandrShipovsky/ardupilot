@@ -1193,7 +1193,7 @@ public:
 protected:
 
     const char *name() const override { return "FOLLOWME"; }
-    const char *name4() const override { return "FLME"; }
+    const char *name4() const override { return "ATAK"; }
 
         // PARAMS
     AP_Float hFOV;         // horizontal FOV def 120grad
