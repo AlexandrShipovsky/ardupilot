@@ -31,6 +31,9 @@ from launch_ros.substitutions import FindPackageShare
 
 from .actions import ExecuteFunction
 
+TRUE_STRING = "True"
+FALSE_STRING = "False"
+BOOL_STRING_CHOICES = set([TRUE_STRING, FALSE_STRING])
 
 class VirtualPortsLaunch:
     """Launch functions for creating virtual ports using `socat`."""
@@ -307,10 +310,10 @@ class MAVProxyLaunch:
             "--non-interactive ",
         ]
 
-        if console:
+        if console == TRUE_STRING:
             cmd.append("--console ")
 
-        if map:
+        if map == TRUE_STRING:
             cmd.append("--map ")
 
         # Create action.
@@ -369,11 +372,13 @@ class MAVProxyLaunch:
                 "map",
                 default_value="False",
                 description="Enable MAVProxy Map.",
+                choices=BOOL_STRING_CHOICES
             ),
             DeclareLaunchArgument(
                 "console",
                 default_value="False",
                 description="Enable MAVProxy Console.",
+                choices=BOOL_STRING_CHOICES
             ),
         ]
 
@@ -381,8 +386,6 @@ class MAVProxyLaunch:
 class SITLLaunch:
     """Launch functions for ArduPilot SITL."""
 
-    # Labels for the optional uart launch arguments.
-    UART_LABELS = ["A", "B", "C", "D", "E", "F", "H", "I", "J"]
     MAX_SERIAL_PORTS = 10
 
     @staticmethod
@@ -419,12 +422,12 @@ class SITLLaunch:
 
         # Optional arguments.
         wipe = LaunchConfiguration("wipe").perform(context)
-        if wipe == "True":
+        if wipe == TRUE_STRING:
             cmd_args.append("--wipe ")
             print(f"wipe:             {wipe}")
 
         synthetic_clock = LaunchConfiguration("synthetic_clock").perform(context)
-        if synthetic_clock == "True":
+        if synthetic_clock == TRUE_STRING:
             cmd_args.append("--synthetic-clock ")
             print(f"synthetic_clock:  {synthetic_clock}")
 
@@ -432,13 +435,6 @@ class SITLLaunch:
         if home:
             cmd_args.append(f"--home {home} ")
             print(f"home:             {home}")
-
-        # Optional uart arguments.
-        for label in SITLLaunch.UART_LABELS:
-            arg = LaunchConfiguration(f"uart{label}").perform(context)
-            if arg:
-                cmd_args.append(f"--uart{label} {arg} ")
-                print(f"uart{label}:            {arg}")
 
         # Optional serial arguments.
         for label in range(10):
@@ -586,13 +582,13 @@ class SITLLaunch:
                 "wipe",
                 default_value="False",
                 description="Wipe eeprom.",
-                choices=["True", "False"],
+                choices=BOOL_STRING_CHOICES,
             ),
             DeclareLaunchArgument(
                 "synthetic_clock",
                 default_value="False",
                 description="Set synthetic clock mode.",
-                choices=["True", "False"],
+                choices=BOOL_STRING_CHOICES,
             ),
             DeclareLaunchArgument(
                 "home",
@@ -646,16 +642,6 @@ class SITLLaunch:
             ),
         ]
 
-        # UART launch arguments.
-        uart_args = []
-        for label in SITLLaunch.UART_LABELS:
-            arg = DeclareLaunchArgument(
-                f"uart{label}",
-                default_value="",
-                description=f"set device string for UART{label}.",
-            )
-            uart_args.append(arg)
-
         # Serial launch arguments.
         serial_args = []
         for label in range(SITLLaunch.MAX_SERIAL_PORTS):
@@ -666,4 +652,4 @@ class SITLLaunch:
             )
             serial_args.append(arg)
 
-        return launch_args + uart_args + serial_args
+        return launch_args + serial_args
