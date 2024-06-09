@@ -48,8 +48,8 @@ bool ModeFollowMe::init(bool ignore_checks)
 
     // init LPF for vertical speed control
     AngleCapture = false;
-    targetAngleFilt.set_cutoff_frequency(0.5);
-    PsiAngleFilt.set_cutoff_frequency(5.0);
+    targetAngleFilt.set_cutoff_frequency(20.0);
+    PsiAngleFilt.set_cutoff_frequency(20.0);
     // start in angle control mode
     ModeGuided::angle_control_start();
     return true;
@@ -75,8 +75,8 @@ void ModeFollowMe::run()
         teta = (DEG_TO_RAD*vFOV/2)*osdobj->y_followme;
 
         // filt psi
-        PsiAngleFilt.apply(psi);
-        psi = PsiAngleFilt.get();
+        //PsiAngleFilt.apply(psi);
+        //psi = PsiAngleFilt.get();
 
         // calc target vector body frame
         targetV.x = cosF(psi);

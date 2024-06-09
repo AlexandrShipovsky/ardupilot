@@ -19,7 +19,7 @@ FLASH_SIZE_KB 1024
 FLASH_USE_MAX_KB 16
 
 # location of application code
-FLASH_BOOTLOADER_LOAD_KB 48
+FLASH_BOOTLOADER_LOAD_KB 64
 
 # bootloader loads at start of flash
 FLASH_RESERVE_START_KB 0
@@ -34,7 +34,7 @@ SERIAL_ORDER OTG1
 # setup as OPENDRAIN
 #TODO
 #PA9 VBUS INPUT PULLUP
-PA9  PINIO1 OUTPUT HIGH
+#PA9  PINIO1 OUTPUT HIGH
 
 # now we define the pins that USB is connected on
 PA11 OTG_FS_DM OTG1
