@@ -414,7 +414,7 @@ void UARTDriver::_begin(uint32_t b, uint16_t rxS, uint16_t txS)
                 // we only allow for sharing of the TX DMA channel, not the RX
                 // DMA channel, as the RX side is active all the time, so
                 // cannot be shared
-                dma_handle = new Shared_DMA(sdef.dma_tx_stream_id,
+                dma_handle = NEW_NOTHROW Shared_DMA(sdef.dma_tx_stream_id,
                                             SHARED_DMA_NONE,
                                             FUNCTOR_BIND_MEMBER(&UARTDriver::dma_tx_allocate, void, Shared_DMA *),
                                             FUNCTOR_BIND_MEMBER(&UARTDriver::dma_tx_deallocate, void, Shared_DMA *));
@@ -667,6 +667,19 @@ uint32_t UARTDriver::get_usb_baud() const
 #if HAL_USE_SERIAL_USB
     if (sdef.is_usb) {
         return ::get_usb_baud(sdef.endpoint_id);
+    }
+#endif
+    return 0;
+}
+
+/*
+    get the requested usb parity.  Valid if get_usb_baud() returned non-zero.
+*/
+uint8_t UARTDriver::get_usb_parity() const
+{
+#if HAL_USE_SERIAL_USB
+    if (sdef.is_usb) {
+        return ::get_usb_parity(sdef.endpoint_id);
     }
 #endif
     return 0;
@@ -1429,6 +1442,7 @@ void UARTDriver::configure_parity(uint8_t v)
         // not possible
         return;
     }
+    UARTDriver::parity = v;
 #if HAL_USE_SERIAL == TRUE
     // stop and start to take effect
     sdStop((SerialDriver*)sdef.serial);

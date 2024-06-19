@@ -44,6 +44,44 @@ function uint32_t_ud:tofloat() end
 ---@return integer
 function uint32_t_ud:toint() end
 
+---@class (exact) uint64_t_ud
+---@operator add(uint64_t_ud|uint32_t_ud|integer|number): uint64_t_ud
+---@operator sub(uint64_t_ud|uint32_t_ud|integer|number): uint64_t_ud
+---@operator mul(uint64_t_ud|uint32_t_ud|integer|number): uint64_t_ud
+---@operator div(uint64_t_ud|uint32_t_ud|integer|number): uint64_t_ud
+---@operator mod(uint64_t_ud|uint32_t_ud|integer|number): uint64_t_ud
+---@operator band(uint64_t_ud|uint32_t_ud|integer|number): uint64_t_ud
+---@operator bor(uint64_t_ud|uint32_t_ud|integer|number): uint64_t_ud
+---@operator shl(uint64_t_ud|uint32_t_ud|integer|number): uint64_t_ud
+---@operator shr(uint64_t_ud|uint32_t_ud|integer|number): uint64_t_ud
+local uint64_t_ud = {}
+
+-- create uint64_t_ud with optional value
+-- Note that lua ints are 32 bits and lua floats will loose resolution at large values
+---@param value? uint64_t_ud|uint32_t_ud|integer|number
+---@return uint64_t_ud
+function uint64_t(value) end
+
+-- create uint64_t_ud from a low and high half
+-- value = (high << 32) | low
+---@param high uint32_t_ud|integer|number
+---@param low uint32_t_ud|integer|number
+---@return uint64_t_ud
+function uint64_t(high, low) end
+
+-- Convert to number, will loose resolution at large values
+---@return number
+function uint64_t_ud:tofloat() end
+
+-- Convert to integer, nil if too large to be represented by native int32
+---@return integer|nil
+function uint64_t_ud:toint() end
+
+-- Split into high and low half's, returning each as a uint32_t_ud
+---@return uint32_t_ud -- high (value >> 32)
+---@return uint32_t_ud -- low (value & 0xFFFFFFFF)
+function uint64_t_ud:split() end
+
 -- system time in milliseconds
 ---@return uint32_t_ud -- milliseconds
 function millis() end
@@ -69,14 +107,21 @@ function print(text) end
 -- data flash logging to SD card
 logger = {}
 
--- write value to data flash log with given types and names, optional units and multipliers, timestamp will be automatically added
+-- write value to data flash log with given types and names with units and multipliers, timestamp will be automatically added
 ---@param name string -- up to 4 characters
 ---@param labels string -- comma separated value labels, up to 58 characters
 ---@param format string -- type format string, see https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_Logger/README.md
----@param units? string -- optional units string
----@param multipliers? string -- optional multipliers string
----@param data1 integer|number|uint32_t_ud|string -- data to be logged, type to match format string
-function logger:write(name, labels, format, units, multipliers, data1, ...) end
+---@param units string -- units string
+---@param multipliers string -- multipliers string
+---@param ... integer|number|uint32_t_ud|string -- data to be logged, type to match format string
+function logger:write(name, labels, format, units, multipliers, ...) end
+
+-- write value to data flash log with given types and names, timestamp will be automatically added
+---@param name string -- up to 4 characters
+---@param labels string -- comma separated value labels, up to 58 characters
+---@param format string -- type format string, see https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_Logger/README.md
+---@param ... integer|number|uint32_t_ud|string -- data to be logged, type to match format string
+function logger:write(name, labels, format, ...) end
 
 -- log a files content to onboard log
 ---@param filename string -- file name
@@ -662,38 +707,39 @@ function mavlink_mission_item_int_t_ud:param1() end
 function mavlink_mission_item_int_t_ud:param1(value) end
 
 
--- desc
+-- Parameter access helper.
 ---@class (exact) Parameter_ud
 local Parameter_ud = {}
 
+-- Create a new parameter helper, init must be called with a parameter name.
 ---@return Parameter_ud
----@param name? string
-function Parameter(name) end
+function Parameter() end
 
--- desc
+-- Set the defualt value of this parameter, if the parameter has not been configured by the user its value will be updated to the new defualt.
 ---@param value number
 ---@return boolean
 function Parameter_ud:set_default(value) end
 
--- desc
+-- Return true if the parameter has been configured by the user.
 ---@return boolean
 function Parameter_ud:configured() end
 
--- desc
+-- Set the parameter to the given value and save. The value will be persistant after a reboot.
 ---@param value number
 ---@return boolean
 function Parameter_ud:set_and_save(value) end
 
--- desc
+-- Set the parameter to the given value. The value will not persist a reboot.
 ---@param value number
 ---@return boolean
 function Parameter_ud:set(value) end
 
--- desc
+-- Get the current value of a parameter.
+-- Returns nil if the init has not been called and a valid parameter found.
 ---@return number|nil
 function Parameter_ud:get() end
 
--- desc
+-- Init the paramter from a key. This allows the script to load old parameter that have been removed from the main code.
 ---@param key integer
 ---@param group_element uint32_t_ud|integer|number
 ---@param type integer
@@ -704,11 +750,43 @@ function Parameter_ud:get() end
 ---@return boolean
 function Parameter_ud:init_by_info(key, group_element, type) end
 
--- desc
+-- Init this parameter from a name.
 ---@param name string
 ---@return boolean
 function Parameter_ud:init(name) end
 
+-- Parameter access helper
+---@class (exact) Parameter_ud_const
+local Parameter_ud_const = {}
+
+-- Create a new parameter helper with a parameter name.
+-- This will error if no parameter with the given name is found.
+---@return Parameter_ud_const
+---@param name string
+function Parameter(name) end
+
+-- Set the defualt value of this parameter, if the parameter has not been configured by the user its value will be updated to the new defualt.
+---@param value number
+---@return boolean
+function Parameter_ud_const:set_default(value) end
+
+-- Retrun true if the parameter has been configured by the user.
+---@return boolean
+function Parameter_ud_const:configured() end
+
+-- Set the parameter to the given value and save. The value will be persistant after a reboot.
+---@param value number
+---@return boolean
+function Parameter_ud_const:set_and_save(value) end
+
+-- Set the parameter to the given value. The value will not persist a reboot.
+---@param value number
+---@return boolean
+function Parameter_ud_const:set(value) end
+
+-- Get the current value of a parameter.
+---@return number
+function Parameter_ud_const:get() end
 
 -- Vector2f is a userdata object that holds a 2D vector with x and y components. The components are stored as floating point numbers.
 -- To create a new Vector2f you can call Vector2f() to allocate a new one, or call a method that returns one to you.
@@ -2024,7 +2102,7 @@ function baro:healthy(instance) end
 -- Serial ports
 serial = {}
 
--- Returns the UART instance that allows connections from scripts (those with SERIALx_PROTOCOL = 28`).
+-- Returns the UART instance that allows connections from scripts (those with SERIALx_PROTOCOL = 28).
 -- For instance = 0, returns first such UART, second for instance = 1, and so on.
 -- If such an instance is not found, returns nil.
 ---@param instance integer -- the 0-based index of the UART instance to return.
@@ -2818,6 +2896,11 @@ gps.GPS_OK_FIX_3D = enum_integer
 gps.GPS_OK_FIX_2D = enum_integer
 gps.NO_FIX = enum_integer
 gps.NO_GPS = enum_integer
+
+-- get unix time
+---@param instance integer -- instance number
+---@return uint64_t_ud -- unix time microseconds
+function gps:time_epoch_usec(instance) end
 
 -- get yaw from GPS in degrees
 ---@param instance integer -- instance number
